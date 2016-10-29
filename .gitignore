@@ -1,0 +1,4 @@
+*.class
+arcgis-java-sdk-100.0.0-beta-2/*
+resources/*
+jniLibs/*
