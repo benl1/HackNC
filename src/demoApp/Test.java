@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Random;
 
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.SpatialReference;
@@ -54,6 +55,8 @@ public class Test extends Application {
   Tour                    tour;
   ArrayList<Camera> tourLocations;
   int nextTourIndex;
+  Graphic goalSphere;
+  GraphicsOverlay drapedGraphicsOverlay;
 
   public void start(Stage e) throws Exception {
     
@@ -61,7 +64,15 @@ public class Test extends Application {
     nextTourIndex = 0;
     tourLocations = new ArrayList<>();
     
+
     
+    // Yosemite
+    tourLocations.add(new Camera(
+    		37.74169172721636,
+    		-119.58455716838428,
+    		2451.021166132763,
+    		245.51413277748176,
+    		75.47528817260508, 0));
     
     // Chilean Fjords
     tourLocations.add(new Camera(
@@ -80,13 +91,7 @@ public class Test extends Application {
     		199.14251186577462,
     		77.2356961105611, 0));
 
-    // Great Wall of China
-    tourLocations.add(new Camera(
-    		40.38722459849128, 
-    		116.57624628608481,
-    		10232.386429083534, 
-    		29.106149428982615, 
-    		62.231688208195884, 0));
+
     // Mount Everest
     tourLocations.add(new Camera(27.487289572976692, 
     		86.88540486257297, 
@@ -105,14 +110,6 @@ public class Test extends Application {
     		6828.150498895906, 
     		255.83535027285143, 
     		69.95918086930413, 0));
-    
-    // Yosemite
-    tourLocations.add(new Camera(
-    		37.74169172721636,
-    		-119.58455716838428,
-    		1451.0211661336944,
-    		247.14463025548855,
-    		89.855920669886, 0));
 
     
 
@@ -143,7 +140,7 @@ public class Test extends Application {
     
     
     //
-    GraphicsOverlay drapedGraphicsOverlay = new GraphicsOverlay();
+    drapedGraphicsOverlay = new GraphicsOverlay();
     drapedGraphicsOverlay.getSceneProperties().setSurfacePlacement(SurfacePlacement.DRAPED);
     sceneView.getGraphicsOverlays().add(drapedGraphicsOverlay);
 
@@ -157,24 +154,18 @@ public class Test extends Application {
     relativeGraphicsOverlay.getSceneProperties().setSurfacePlacement(SurfacePlacement.RELATIVE);
     sceneView.getGraphicsOverlays().add(relativeGraphicsOverlay);
 
-    //create a point and markers
-    Point location = new Point(116.5704, 40.4319, 0,SpatialReference.create(4152));
-    Point location2 = new Point(35.6, -100.0, 0, SpatialReference.create(4152));
-    SimpleMarkerSceneSymbol greenMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xCC880000, 3000,
+    SimpleMarkerSceneSymbol blueMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xAA0000FF, 3000,
             3000, 3000, AnchorPosition.CENTER);
-    SimpleMarkerSceneSymbol redMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xCC880000, 3000,
-            3000, 3000, AnchorPosition.CENTER);
-    SimpleMarkerSceneSymbol blueMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xCC880000, 3000,
-            3000, 3000, AnchorPosition.CENTER);
-
+    
+    Point sphereLocation = camera.moveForward(50000).getLocation();
+    
     // add the graphics in the different overlays
-    Graphic drapedGraphic = new Graphic(location, redMarker);
+    goalSphere = new Graphic(sphereLocation, blueMarker);
 //    Graphic absoluteGraphic = new Graphic(location, blueMarker);
 //    Graphic relativeGraphic = new Graphic(location2, greenMarker);
-    drapedGraphicsOverlay.getGraphics().add(drapedGraphic);
+    drapedGraphicsOverlay.getGraphics().add(goalSphere);
 //    absoluteGraphicsOverlay.getGraphics().add(absoluteGraphic);
 //    relativeGraphicsOverlay.getGraphics().add(relativeGraphic);
-    //
 
     // add an elevation surface from an elevation source
     ArcGISTiledElevationSource elevationSource = new ArcGISTiledElevationSource("http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer");
@@ -212,6 +203,30 @@ public class Test extends Application {
     				nextTourIndex = 0;
     				sceneView.setViewpointCameraAsync(camera);
     			}
+    			
+    			Random javaRandom = new Random();
+    			// create a relative graphics overlay
+    		    GraphicsOverlay relativeGraphicsOverlay = new GraphicsOverlay();
+    		    relativeGraphicsOverlay.getSceneProperties().setSurfacePlacement(SurfacePlacement.RELATIVE);
+    		    sceneView.getGraphicsOverlays().add(relativeGraphicsOverlay);
+
+    		    SimpleMarkerSceneSymbol blueMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xAA0000FF, 3000,
+    		            3000, 3000, AnchorPosition.CENTER);
+    		    
+    		    Point sphereInitial = camera.moveForward(40000 + javaRandom.nextInt(15000)).getLocation();
+    		    
+    		    Point sphereLocation = new Point(
+    		    		sphereInitial.getX() + javaRandom.nextDouble() - .5,
+    		    		sphereInitial.getY() + javaRandom.nextDouble() - .5,
+    		    		sphereInitial.getZ(),
+    		    		sphereInitial.getSpatialReference()
+    		    		);
+    		    
+    		    // add the graphics in the different overlays
+    		    goalSphere = new Graphic(sphereLocation, blueMarker);
+//    		    Graphic absoluteGraphic = new Graphic(location, blueMarker);
+//    		    Graphic relativeGraphic = new Graphic(location2, greenMarker);
+    		    drapedGraphicsOverlay.getGraphics().add(goalSphere);
     		}
     	}
     	
