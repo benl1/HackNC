@@ -14,7 +14,7 @@ public class Tour {
     _name = name;
   }
 
-  public void addCheckpotint(double latitude, double longitude) {
+  public void addCheckpoint(double latitude, double longitude) {
     _checkpoints.add(new Point(longitude, latitude));
   }
 

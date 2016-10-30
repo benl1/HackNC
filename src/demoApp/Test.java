@@ -1,7 +1,13 @@
 package demoApp;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.geometry.SpatialReference;
@@ -42,10 +48,11 @@ public class Test extends Application {
   private SceneView       sceneView;
   private String          location;
   ComboBox                comboBox;
-  
+  Tour                    tour;
 
   public void start(Stage e) throws Exception {
     
+    Tour china = new Tour("Great Wall of China");
     
     
 
@@ -203,7 +210,68 @@ public class Test extends Application {
     	  if (bool) {
     		  System.out.println("======\nLat: " + camera.getLocation().getX());
     		  System.out.println("Long: " + camera.getLocation().getY());
+    		  //https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY
+    		  URL url = null;
+    		  
+    		  try {
+            url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
+          } catch (MalformedURLException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+          }
+          Scanner s = null;
+          try {
+            s = new Scanner(url.openStream());
+            while(s.hasNext()){
+             // System.out.println(s.next());
+            }
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+    		  
+    		  
+    		  
+    		  
+          try {
+            url = new URL("https://maps.googleapis.com/maps/api/place/radarsearch/json?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&radius=5000&type=food&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
+          } catch (MalformedURLException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+          }
+    		  Scanner s = null;
+          try {
+            s = new Scanner(url.openStream());
+            while(s.hasNext()){
+             // System.out.println(s.next());
+            }
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+    		  
     	  }
+      }
+      
+      public void buttonX(boolean bool){
+        if(bool) {
+          System.out.println("added CheckPoint");
+          System.out.println("======\nLat: " + camera.getLocation().getY());
+          System.out.println("Long: " + camera.getLocation().getX());
+          china.addCheckpoint(camera.getLocation().getY(), camera.getLocation().getX());
+        }
+        
+      }
+      public void buttonY(boolean bool){
+        ArrayList<Point> p = china.getCheckPoints();
+        if(bool){
+          if(!p.isEmpty()){
+            
+            camera = camera.moveTo(p.remove(0));
+            sceneView.setViewpointCameraAsync(camera);
+          }
+         
+        }
       }
 
     });
