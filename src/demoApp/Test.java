@@ -120,6 +120,7 @@ public class Test extends Application {
     e.show();
 
     XboxController xc = new XboxController();
+  
     xc.addXboxControllerListener(new XboxControllerAdapter() {
 
       public void rightThumbDirection(double d) {
@@ -149,6 +150,13 @@ public class Test extends Application {
         sceneView.setViewpointCameraAsync(camera);
 
       }
+      
+      public void buttonA(boolean p){
+        if (p){
+          camera = camera.moveForward(500);
+          sceneView.setViewpointCameraAsync(camera);
+        }
+      }
 
       public void rightThumbMagnitude(double m) {
         rightMagnitude = 5.0 * m;
@@ -156,7 +164,7 @@ public class Test extends Application {
 
       public void leftThumbMagnitude(double m) {
 
-        leftMagnitude = .01 / 1600.0 * camera.getLocation().getZ();
+        leftMagnitude = .01 / 1600.0 * camera.getLocation().getZ() * m;
       }
 
       public void leftThumbDirection(double d) {
@@ -191,7 +199,7 @@ public class Test extends Application {
         sceneView.setViewpointCameraAsync(camera);
       }
       
-      public void buttonA(boolean bool) {
+      public void buttonB(boolean bool) {
     	  if (bool) {
     		  System.out.println("======\nLat: " + camera.getLocation().getX());
     		  System.out.println("Long: " + camera.getLocation().getY());
