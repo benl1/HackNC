@@ -63,7 +63,7 @@ public class Test extends Application {
     sceneView = new SceneView();
     sceneView.setArcGISScene(AGSscene);
 
-    camera = new Camera(0, 0,1289, 295, 71, 0);
+    camera = new Camera(35.6, -79,1289, 295, 71, 0);
     
     //
     GraphicsOverlay drapedGraphicsOverlay = new GraphicsOverlay();
@@ -81,7 +81,8 @@ public class Test extends Application {
     sceneView.getGraphicsOverlays().add(relativeGraphicsOverlay);
 
     //create a point and markers
-    Point location = new Point(35.6, -79.0, 0,SpatialReference.create(4152));
+    Point location = new Point(-79.0, 35.6, 0,SpatialReference.create(4152));
+    Point location2 = new Point(35.6, -100.0, 0, SpatialReference.create(4152));
     SimpleMarkerSymbol greenMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFF00FF00, 10.0f);
     SimpleMarkerSymbol redMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFFFF0000, 10);
     SimpleMarkerSymbol blueMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFF0000FF, 10);
@@ -89,7 +90,7 @@ public class Test extends Application {
     // add the graphics in the different overlays
     Graphic drapedGraphic = new Graphic(location, redMarker);
     Graphic absoluteGraphic = new Graphic(location, blueMarker);
-    Graphic relativeGraphic = new Graphic(location, greenMarker);
+    Graphic relativeGraphic = new Graphic(location2, greenMarker);
     drapedGraphicsOverlay.getGraphics().add(drapedGraphic);
     absoluteGraphicsOverlay.getGraphics().add(absoluteGraphic);
     relativeGraphicsOverlay.getGraphics().add(relativeGraphic);
@@ -155,22 +156,20 @@ public class Test extends Application {
       public void leftThumbDirection(double d) {
         double latitudeChange = 0;
         double longitudeChange = 0;
-        if (d >= 0 && d <= 90) {
-          latitudeChange = (0 + d) * (leftMagnitude / 90.0);
-          longitudeChange = (90 - d) * (leftMagnitude / 90.0);
-        } else if (d > 90 && d <= 180) {
-          d -= 90;
-          latitudeChange = (0 + d) * (leftMagnitude / 90.0);
-          longitudeChange = (90 - d) * (-leftMagnitude / 90.0);
-        } else if (d > 180 && d <= 270) {
-          d -= 180;
-          latitudeChange = (0 + d) * (-leftMagnitude / 90.0);
-          longitudeChange = (90 - d) * (-leftMagnitude / 90.0);
-        } else {
-          d -= 270;
-          latitudeChange = (0 + d) * (-leftMagnitude / 90.0);
-          longitudeChange = (90 - d) * (leftMagnitude / 90.0);
+        if (camera.getHeading() < 90 && camera.getHeading() > 0) {
+        	if ( d > 180 && d < 360 ) {
+           	 // if you are going left, and your heading is in between 0 and 90:
+           	latitudeChange =  - Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+           	longitudeChange =  Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+           } else  {
+           	// if you are going right, and your heading is in between 0 and 90:
+           	latitudeChange =   Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+           	longitudeChange =  -  Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+           }
         }
+        
+       
+    	
 
         // System.out.println(latitudeChange);
         // System.out.println(longitudeChange);
