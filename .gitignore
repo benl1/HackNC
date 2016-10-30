@@ -3,3 +3,4 @@ arcgis-java-sdk-100.0.0-beta-2/*
 resources/*
 jniLibs/*
 JXInput_0.3.4/*
+/bin/
