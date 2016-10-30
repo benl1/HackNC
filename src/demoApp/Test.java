@@ -63,7 +63,7 @@ public class Test extends Application {
     sceneView = new SceneView();
     sceneView.setArcGISScene(AGSscene);
 
-    camera = new Camera(35.6, -79,1289, 295, 71, 0);
+    camera = new Camera(35.6, -79,1289, 45, 71, 0);
     
     //
     GraphicsOverlay drapedGraphicsOverlay = new GraphicsOverlay();
@@ -164,15 +164,15 @@ public class Test extends Application {
            } else  {
            	// if you are going right, and your heading is in between 0 and 90:
            	latitudeChange =   Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-           	longitudeChange =  -  Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+           	longitudeChange = -   Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
            }
         }
         
        
-    	
-
-        // System.out.println(latitudeChange);
-        // System.out.println(longitudeChange);
+    	System.out.println("Direction: " + d);
+        System.out.println("Heading: " + camera.getHeading());
+         System.out.println("Lat change " + latitudeChange);
+         System.out.println("Long change " + longitudeChange);
 
         Point p = new Point(camera.getLocation().getX() + longitudeChange, camera.getLocation().getY() + latitudeChange, camera.getLocation().getZ(), SpatialReference.create(4152));
         // System.out.println(p.getX() + "," + p.getY() + ","+ p.getZ());
