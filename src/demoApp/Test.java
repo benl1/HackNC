@@ -57,6 +57,7 @@ public class Test extends Application {
   int nextTourIndex;
   Graphic goalSphere;
   GraphicsOverlay drapedGraphicsOverlay;
+  Point sphereLocation;
 
   public void start(Stage e) throws Exception {
     
@@ -157,7 +158,7 @@ public class Test extends Application {
     SimpleMarkerSceneSymbol blueMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xAA0000FF, 3000,
             3000, 3000, AnchorPosition.CENTER);
     
-    Point sphereLocation = camera.moveForward(50000).getLocation();
+    sphereLocation = camera.moveForward(50000).getLocation();
     
     // add the graphics in the different overlays
     goalSphere = new Graphic(sphereLocation, blueMarker);
@@ -215,7 +216,7 @@ public class Test extends Application {
     		    
     		    Point sphereInitial = camera.moveForward(40000 + javaRandom.nextInt(15000)).getLocation();
     		    
-    		    Point sphereLocation = new Point(
+    		    sphereLocation = new Point(
     		    		sphereInitial.getX() + javaRandom.nextDouble() - .5,
     		    		sphereInitial.getY() + javaRandom.nextDouble() - .5,
     		    		sphereInitial.getZ(),
@@ -270,7 +271,44 @@ public class Test extends Application {
         	}
 //        	if potentialAltitude
           camera = camera.moveTo(potentialLocation);
-          System.out.println(camera.getLocation().getZ());
+//          System.out.println(camera.getLocation().getZ());
+          double distanceToSphere = distance(camera.getLocation(), sphereLocation);
+          System.out.println("Distance: " + distanceToSphere);
+          if (distanceToSphere < 0.023) {
+  			if (nextTourIndex < tourLocations.size()) {
+				camera = tourLocations.get(nextTourIndex);
+				nextTourIndex += 1;
+				sceneView.setViewpointCameraAsync(camera);
+			} else {
+				camera = tourLocations.get(0);
+				nextTourIndex = 0;
+				sceneView.setViewpointCameraAsync(camera);
+			}
+			
+			Random javaRandom = new Random();
+			// create a relative graphics overlay
+		    GraphicsOverlay relativeGraphicsOverlay = new GraphicsOverlay();
+		    relativeGraphicsOverlay.getSceneProperties().setSurfacePlacement(SurfacePlacement.RELATIVE);
+		    sceneView.getGraphicsOverlays().add(relativeGraphicsOverlay);
+
+		    SimpleMarkerSceneSymbol blueMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xAA0000FF, 3000,
+		            3000, 3000, AnchorPosition.CENTER);
+		    
+		    Point sphereInitial = camera.moveForward(40000 + javaRandom.nextInt(15000)).getLocation();
+		    
+		    sphereLocation = new Point(
+		    		sphereInitial.getX() + javaRandom.nextDouble() - .5,
+		    		sphereInitial.getY() + javaRandom.nextDouble() - .5,
+		    		sphereInitial.getZ(),
+		    		sphereInitial.getSpatialReference()
+		    		);
+		    
+		    // add the graphics in the different overlays
+		    goalSphere = new Graphic(sphereLocation, blueMarker);
+//		    Graphic absoluteGraphic = new Graphic(location, blueMarker);
+//		    Graphic relativeGraphic = new Graphic(location2, greenMarker);
+		    drapedGraphicsOverlay.getGraphics().add(goalSphere);
+          }
           sceneView.setViewpointCameraAsync(camera);
         }
       }
@@ -424,6 +462,14 @@ public class Test extends Application {
     });
   }
 
+  public static double distance(Point a, Point b) {
+	  
+	  double termX = Math.pow(a.getX() - b.getX(), 2);
+	  double termY = Math.pow(a.getY() - b.getY(), 2);
+	  
+	  return Math.sqrt(termX + termY);
+  }
+  
   @Override
   public void stop() throws Exception {
     sceneView.dispose();
