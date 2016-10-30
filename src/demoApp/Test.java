@@ -11,7 +11,12 @@ import com.esri.arcgisruntime.mapping.ArcGISTiledElevationSource;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.Surface;
 import com.esri.arcgisruntime.mapping.view.Camera;
+import com.esri.arcgisruntime.mapping.view.Graphic;
+import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
+import com.esri.arcgisruntime.mapping.view.LayerSceneProperties.SurfacePlacement;
 import com.esri.arcgisruntime.mapping.view.SceneView;
+import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
+import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol.Style;
 
 import ch.aplu.xboxcontroller.XboxController;
 import ch.aplu.xboxcontroller.XboxControllerAdapter;
@@ -34,15 +39,12 @@ public class Test extends Application {
   private SceneView       sceneView;
   private String          location;
   ComboBox                comboBox;
-  Map<String, Coordinate> places;
+  
 
   public void start(Stage e) throws Exception {
-    places = new HashMap<String, Coordinate>();
-    places.put("Mt. Everest", new Coordinate(27.9878, 86.9250));
-    places.put("Great Wall of China", new Coordinate(40.4319, 116.5704));
-    places.put("Yosemite", new Coordinate(37.8651, -119.5383));
-    showStartStage();
-    shoMapStage(e);
+    
+    
+    
 
     BorderPane borderPane = new BorderPane();
     Scene scene = new Scene(borderPane);
@@ -61,7 +63,37 @@ public class Test extends Application {
     sceneView = new SceneView();
     sceneView.setArcGISScene(AGSscene);
 
-    camera = new Camera(places.get(location).getLatitude(), places.get(location).getLongitude(), 1289, 295, 71, 0);
+    camera = new Camera(0, 0,1289, 295, 71, 0);
+    
+    //
+    GraphicsOverlay drapedGraphicsOverlay = new GraphicsOverlay();
+    drapedGraphicsOverlay.getSceneProperties().setSurfacePlacement(SurfacePlacement.DRAPED);
+    sceneView.getGraphicsOverlays().add(drapedGraphicsOverlay);
+
+    // create an absolute graphics overlay
+    GraphicsOverlay absoluteGraphicsOverlay = new GraphicsOverlay();
+    absoluteGraphicsOverlay.getSceneProperties().setSurfacePlacement(SurfacePlacement.ABSOLUTE);
+    sceneView.getGraphicsOverlays().add(absoluteGraphicsOverlay);
+
+    // create a relative graphics overlay
+    GraphicsOverlay relativeGraphicsOverlay = new GraphicsOverlay();
+    relativeGraphicsOverlay.getSceneProperties().setSurfacePlacement(SurfacePlacement.RELATIVE);
+    sceneView.getGraphicsOverlays().add(relativeGraphicsOverlay);
+
+    //create a point and markers
+    Point location = new Point(35.6, -79.0, 0,SpatialReference.create(4152));
+    SimpleMarkerSymbol greenMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFF00FF00, 10.0f);
+    SimpleMarkerSymbol redMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFFFF0000, 10);
+    SimpleMarkerSymbol blueMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFF0000FF, 10);
+
+    // add the graphics in the different overlays
+    Graphic drapedGraphic = new Graphic(location, redMarker);
+    Graphic absoluteGraphic = new Graphic(location, blueMarker);
+    Graphic relativeGraphic = new Graphic(location, greenMarker);
+    drapedGraphicsOverlay.getGraphics().add(drapedGraphic);
+    absoluteGraphicsOverlay.getGraphics().add(absoluteGraphic);
+    relativeGraphicsOverlay.getGraphics().add(relativeGraphic);
+    //
 
     // add an elevation surface from an elevation source
     ArcGISTiledElevationSource elevationSource = new ArcGISTiledElevationSource("http://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer");
@@ -167,24 +199,5 @@ public class Test extends Application {
     launch(args);
   }
 
-  public void showStartStage() {
-    Stage startStage = new Stage();
-    Group g = new Group();
-    Scene scene = new Scene(g);
-    Button b = new Button();
-    b.setText("Go!");
-    b.setOnAction(new EventHandler<ActionEvent>() {
-      @Override public void handle(ActionEvent e) {
-        startStage.close();
-      }
-  });
-    });
-
-  ObservableList<String> options = FXCollections.observableArrayList("Mt. Everest", "Great Wall of China",
-      "Yosemite");comboBox=new ComboBox(options);comboBox.getSelectionModel().selectedItemProperty().addListener((o,old,n)->
-  {
-    location = (String) n;
-  };g.getChildren().add(comboBox);g.getChildren().add(b);startStage.setScene(scene);startStage.show(););
-}
-
+ 
 }
