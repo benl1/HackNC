@@ -237,17 +237,6 @@ public class Test extends Application {
 //      public void leftThumbDirection(double d) {
 //        double latitudeChange = 0;
 //        double longitudeChange = 0;
-//        if (camera.getHeading() < 90 && camera.getHeading() > 0) {
-//        	if ( d > 180 && d < 360 ) {
-//           	 // if you are going left, and your heading is in between 0 and 90:
-//           	latitudeChange =  - Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-//           	longitudeChange =  Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-//           } else  {
-//           	// if you are going right, and your heading is in between 0 and 90:
-//           	latitudeChange =   Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-//           	longitudeChange = -   Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-//           }
-//        }
         
        
 //    	System.out.println("Direction: " + d);
@@ -266,52 +255,52 @@ public class Test extends Application {
 //        sceneView.setViewpointCameraAsync(camera);
 //      }
       
-//      public void buttonB(boolean bool) {
-//    	  if (bool) {
-//    		  System.out.println("======\nLat: " + camera.getLocation().getX());
-//    		  System.out.println("Long: " + camera.getLocation().getY());
-//    		  //https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY
-//    		  URL url = null;
-//    		  
-//    		  try {
-//            url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
-//          } catch (MalformedURLException e1) {
-//            // TODO Auto-generated catch block
-//            e1.printStackTrace();
-//          }
-//          Scanner s = null;
-//          try {
-//            s = new Scanner(url.openStream());
-//            while(s.hasNext()){
-//             // System.out.println(s.next());
-//            }
-//          } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//          }
-//    		  
-//    		  
-//    		  
-//    		  
-//          try {
-//            url = new URL("https://maps.googleapis.com/maps/api/place/radarsearch/json?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&radius=5000&type=food&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
-//          } catch (MalformedURLException e1) {
-//            // TODO Auto-generated catch block
-//            e1.printStackTrace();
-//          }
-//    		  Scanner s = null;
-//          try {
-//            s = new Scanner(url.openStream());
-//            while(s.hasNext()){
-//             // System.out.println(s.next());
-//            }
-//          } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//          }
-//    		  
-//    	  }
-//      }
+      public void buttonB(boolean bool) {
+    	  if (bool) {
+    	    double latitude = camera.getLocation().getY();
+    	    double longitude = camera.getLocation().getX();
+    	    
+    	    URL url = null;
+    	    
+    	    try {
+    	      url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/json?location="+latitude+","+longitude+"&query=closest+restaurants&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
+    	    } catch (MalformedURLException e1) {
+    	      // TODO Auto-generated catch block
+    	      e1.printStackTrace();
+    	    }
+    	    Scanner s = null;
+
+    	    String temp = "";
+    	    ArrayList<String> restaurants = new ArrayList();
+    	    try {
+    	      s = new Scanner(url.openStream());
+    	      while(s.hasNext()){
+    	        temp = s.next();
+    	        if(temp.contains("name")){
+    	          String name = s.next();
+    	          while(!name.contains(",")){
+    	            name+=s.next()+" ";
+    	          }
+    	          
+    	          
+    	          restaurants.add(name.substring(2,name.length()-3));
+    	          System.out.println("======Nearest Restaurants======");
+    	          System.out.println(name.substring(2,name.length()-3));
+    	         if (restaurants.size()==5){
+    	           
+    	           break;
+    	         }
+    	          
+    	          
+    	        }
+    	        
+    	      }
+    	    } catch (IOException e) {
+    	      // TODO Auto-generated catch block
+    	      e.printStackTrace();
+    	    }
+    	  }
+      }
       
       public void buttonX(boolean bool){
         if(bool) {
