@@ -22,6 +22,9 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LayerSceneProperties.SurfacePlacement;
 import com.esri.arcgisruntime.mapping.view.SceneView;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
+import com.esri.arcgisruntime.symbology.TextSymbol;
+import com.esri.arcgisruntime.symbology.TextSymbol.HorizontalAlignment;
+import com.esri.arcgisruntime.symbology.TextSymbol.VerticalAlignment;
 import com.esri.arcgisruntime.symbology.SceneSymbol.AnchorPosition;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSceneSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSceneSymbol.Style;
@@ -49,11 +52,68 @@ public class Test extends Application {
   private String          location;
   ComboBox                comboBox;
   Tour                    tour;
+  ArrayList<Camera> tourLocations;
+  int nextTourIndex;
 
   public void start(Stage e) throws Exception {
     
     Tour china = new Tour("Great Wall of China");
+    nextTourIndex = 0;
+    tourLocations = new ArrayList<>();
     
+    
+    
+    // Chilean Fjords
+    tourLocations.add(new Camera(
+    		-48.902825847092,
+    		-74.23081887123965,
+    		2610.716689112596,
+    		86.96069772472258,
+    		78.6124019890956, 0));
+    
+    
+    // Blue Ridge Parkway
+    tourLocations.add(new Camera(
+    		36.364376,
+    		-81.30551700000001,
+    		1451.0211661318317,
+    		199.14251186577462,
+    		77.2356961105611, 0));
+
+    // Great Wall of China
+    tourLocations.add(new Camera(
+    		40.38722459849128, 
+    		116.57624628608481,
+    		10232.386429083534, 
+    		29.106149428982615, 
+    		62.231688208195884, 0));
+    // Mount Everest
+    tourLocations.add(new Camera(27.487289572976692, 
+    		86.88540486257297, 
+    		11703, 12.10, 71.38, 0));
+    // Iceland
+    tourLocations.add(new Camera(66.0358131056401, 
+    		-22.92559929182217, 
+    		500.0, 
+    		237.2227790559418, 
+    		79.9795604661635, 0));
+    
+    // Alaska Glacier
+    tourLocations.add(new Camera(
+    		59.081784282331206, 
+    		-136.83352998205436,
+    		6828.150498895906, 
+    		255.83535027285143, 
+    		69.95918086930413, 0));
+    
+    // Yosemite
+    tourLocations.add(new Camera(
+    		37.74169172721636,
+    		-119.58455716838428,
+    		1451.0211661336944,
+    		247.14463025548855,
+    		89.855920669886, 0));
+
     
 
     BorderPane borderPane = new BorderPane();
@@ -79,13 +139,8 @@ public class Test extends Application {
     // Stone mountatain state park
 //    camera = new Camera(36.3873, -81.0273, 1289, 45, 71, 0);
     // Mount Everest
-//    camera = new Camera(27.487289572976692, 
-//    		86.88540486257297, 
-//    		11703, 12.10, 71.38, 0);
+    camera = tourLocations.get(nextTourIndex++);
     
-    // Denver
-    camera = new Camera(39.7392,
-    		-104.9903, 10000, 12.10, 71.38, 0);
     
     //
     GraphicsOverlay drapedGraphicsOverlay = new GraphicsOverlay();
@@ -128,6 +183,9 @@ public class Test extends Application {
 
     // apply the surface to the scene
     AGSscene.setBaseSurface(surface);
+    
+    
+    
 
     sceneView.setViewpointCameraAsync(camera);
 
@@ -142,7 +200,21 @@ public class Test extends Application {
     XboxController xc = new XboxController();
   
     xc.addXboxControllerListener(new XboxControllerAdapter() {
-
+    	
+    	public void start(boolean pressed) {
+    		if (pressed) {
+    			if (nextTourIndex < tourLocations.size()) {
+    				camera = tourLocations.get(nextTourIndex);
+    				nextTourIndex += 1;
+    				sceneView.setViewpointCameraAsync(camera);
+    			} else {
+    				camera = tourLocations.get(0);
+    				nextTourIndex = 0;
+    				sceneView.setViewpointCameraAsync(camera);
+    			}
+    		}
+    	}
+    	
       public void rightThumbDirection(double d) {
         double headingChange = 0, pitchChange = 0;
         // if (rightMagnitude <= .0001)
@@ -313,15 +385,23 @@ public class Test extends Application {
 //    	  }
 //      }
       
+      
+//      tourLocations.add(new Camera(
+//      		40.38722459849128, 
+//      		116.57624628608481,
+//      		10232.386429083534, 
+//      		29.106149428982615, 
+//      		62.231688208195884, 0));
+      
       public void buttonX(boolean bool){
         if(bool) {
-          System.out.println("added CheckPoint");
-          System.out.println("======\nLat: " + camera.getLocation().getY());
-          System.out.println("Long: " + camera.getLocation().getX());
-          System.out.println("Alt: " + camera.getLocation().getZ());
-          System.out.println("Heading: " + camera.getHeading());
-          System.out.println("Pitch: " + camera.getPitch());
-          china.addCheckpoint(camera.getLocation().getY(), camera.getLocation().getX());
+          System.out.println("=========\ntourLocations.add(new Camera(");
+          System.out.println(camera.getLocation().getY() + ",");
+          System.out.println(camera.getLocation().getX() + ",");
+          System.out.println(camera.getLocation().getZ() + ",");
+          System.out.println(camera.getHeading() + ",");
+          System.out.println(camera.getPitch() + ", 0));");
+//          china.addCheckpoint(camera.getLocation().getY(), camera.getLocation().getX());
         }
         
       }
