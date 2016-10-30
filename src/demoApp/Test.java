@@ -16,7 +16,10 @@ import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.LayerSceneProperties.SurfacePlacement;
 import com.esri.arcgisruntime.mapping.view.SceneView;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
-import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol.Style;
+import com.esri.arcgisruntime.symbology.SceneSymbol.AnchorPosition;
+import com.esri.arcgisruntime.symbology.SimpleMarkerSceneSymbol;
+import com.esri.arcgisruntime.symbology.SimpleMarkerSceneSymbol.Style;
+//import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol.Style;
 
 import ch.aplu.xboxcontroller.XboxController;
 import ch.aplu.xboxcontroller.XboxControllerAdapter;
@@ -63,7 +66,7 @@ public class Test extends Application {
     sceneView = new SceneView();
     sceneView.setArcGISScene(AGSscene);
 
-    camera = new Camera(35.6, -79,1289, 45, 71, 0);
+    camera = new Camera(40.4319, 116.5704, 1289, 45, 71, 0);
     
     //
     GraphicsOverlay drapedGraphicsOverlay = new GraphicsOverlay();
@@ -81,19 +84,22 @@ public class Test extends Application {
     sceneView.getGraphicsOverlays().add(relativeGraphicsOverlay);
 
     //create a point and markers
-    Point location = new Point(-79.0, 35.6, 0,SpatialReference.create(4152));
+    Point location = new Point(116.5704, 40.4319, 0,SpatialReference.create(4152));
     Point location2 = new Point(35.6, -100.0, 0, SpatialReference.create(4152));
-    SimpleMarkerSymbol greenMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFF00FF00, 10.0f);
-    SimpleMarkerSymbol redMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFFFF0000, 10);
-    SimpleMarkerSymbol blueMarker = new SimpleMarkerSymbol(Style.CIRCLE, 0xFF0000FF, 10);
+    SimpleMarkerSceneSymbol greenMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xCC880000, 3000,
+            3000, 3000, AnchorPosition.CENTER);
+    SimpleMarkerSceneSymbol redMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xCC880000, 3000,
+            3000, 3000, AnchorPosition.CENTER);
+    SimpleMarkerSceneSymbol blueMarker = new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbol.Style.SPHERE, 0xCC880000, 3000,
+            3000, 3000, AnchorPosition.CENTER);
 
     // add the graphics in the different overlays
     Graphic drapedGraphic = new Graphic(location, redMarker);
-    Graphic absoluteGraphic = new Graphic(location, blueMarker);
-    Graphic relativeGraphic = new Graphic(location2, greenMarker);
+//    Graphic absoluteGraphic = new Graphic(location, blueMarker);
+//    Graphic relativeGraphic = new Graphic(location2, greenMarker);
     drapedGraphicsOverlay.getGraphics().add(drapedGraphic);
-    absoluteGraphicsOverlay.getGraphics().add(absoluteGraphic);
-    relativeGraphicsOverlay.getGraphics().add(relativeGraphic);
+//    absoluteGraphicsOverlay.getGraphics().add(absoluteGraphic);
+//    relativeGraphicsOverlay.getGraphics().add(relativeGraphic);
     //
 
     // add an elevation surface from an elevation source
@@ -169,10 +175,10 @@ public class Test extends Application {
         }
         
        
-    	System.out.println("Direction: " + d);
-        System.out.println("Heading: " + camera.getHeading());
-         System.out.println("Lat change " + latitudeChange);
-         System.out.println("Long change " + longitudeChange);
+//    	System.out.println("Direction: " + d);
+//        System.out.println("Heading: " + camera.getHeading());
+//         System.out.println("Lat change:" + latitudeChange);
+//         System.out.println("Long change: " + longitudeChange);
 
         Point p = new Point(camera.getLocation().getX() + longitudeChange, camera.getLocation().getY() + latitudeChange, camera.getLocation().getZ(), SpatialReference.create(4152));
         // System.out.println(p.getX() + "," + p.getY() + ","+ p.getZ());
@@ -183,6 +189,13 @@ public class Test extends Application {
         // longitudeChange, l.getZ(), camera.getHeading(), camera.getPitch(),
         // camera.getRoll());
         sceneView.setViewpointCameraAsync(camera);
+      }
+      
+      public void buttonA(boolean bool) {
+    	  if (bool) {
+    		  System.out.println("======\nLat: " + camera.getLocation().getX());
+    		  System.out.println("Long: " + camera.getLocation().getY());
+    	  }
       }
 
     });
