@@ -335,7 +335,7 @@ public class Test extends Application {
     	    URL url = null;
     	    
     	    try {
-    	      url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/json?location="+latitude+","+longitude+"&query=closest+restaurants&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
+    	      url = new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+latitude+","+longitude+"&radius=50000&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
     	    } catch (MalformedURLException e1) {
     	      // TODO Auto-generated catch block
     	      e1.printStackTrace();
