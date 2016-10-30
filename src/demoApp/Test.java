@@ -68,12 +68,24 @@ public class Test extends Application {
     // add a scene service to the scene for viewing buildings
     ArcGISSceneLayer sceneLayer = new ArcGISSceneLayer("http://scene.arcgis.com/arcgis/rest/services/Hosted/Buildings_Brest/SceneServer/layers/0");
     AGSscene.getOperationalLayers().add(sceneLayer);
+  
 
     // create a scene view control and define the scene it displays
     sceneView = new SceneView();
     sceneView.setArcGISScene(AGSscene);
 
-    camera = new Camera(40.4319, 116.5704, 1289, 45, 71, 0);
+//    camera = new Camera(40.4319, 116.5704, 1289, 45, 71, 0);
+//    camera = new Camera(36.1128, -113.9961, 1289, 45, 71, 0);
+    // Stone mountatain state park
+//    camera = new Camera(36.3873, -81.0273, 1289, 45, 71, 0);
+    // Mount Everest
+//    camera = new Camera(27.487289572976692, 
+//    		86.88540486257297, 
+//    		11703, 12.10, 71.38, 0);
+    
+    // Denver
+    camera = new Camera(39.7392,
+    		-104.9903, 10000, 12.10, 71.38, 0);
     
     //
     GraphicsOverlay drapedGraphicsOverlay = new GraphicsOverlay();
@@ -125,6 +137,7 @@ public class Test extends Application {
 
     e.setScene(scene);
     e.show();
+    e.setFullScreen(true);
 
     XboxController xc = new XboxController();
   
@@ -158,11 +171,58 @@ public class Test extends Application {
 
       }
       
-      public void buttonA(boolean p){
-        if (p){
-          camera = camera.moveForward(500);
+      public void rightTrigger(double v){
+        if (v > 0){
+        	System.out.println(v);
+        	double currentAlt = v * camera.getLocation().getZ();
+        	Point potentialLocation = camera.moveForward(currentAlt).getLocation();
+        	if (potentialLocation.getZ() < 1000) {
+        		potentialLocation = new Point(potentialLocation.getX(), 
+        				potentialLocation.getY(),
+        				500, SpatialReference.create(4152) );
+        	}
+//        	if potentialAltitude
+          camera = camera.moveTo(potentialLocation);
+          System.out.println(camera.getLocation().getZ());
           sceneView.setViewpointCameraAsync(camera);
         }
+      }
+      
+      public void leftTrigger(double v){
+          if (v > 0){
+          	System.out.println(v);
+          	double currentAlt = v * camera.getLocation().getZ();
+          	Point potentialLocation = camera.moveForward(-currentAlt).getLocation();
+          	if (potentialLocation.getZ() < 1000) {
+          		potentialLocation = new Point(potentialLocation.getX(), 
+          				potentialLocation.getY(),
+          				500, SpatialReference.create(4152) );
+          	}
+//          	if potentialAltitude
+            camera = camera.moveTo(potentialLocation);
+            System.out.println(camera.getLocation().getZ());
+            sceneView.setViewpointCameraAsync(camera);
+          }
+        }
+      
+      public void leftShoulder(boolean pressed) {
+    	  if (pressed) {
+    		  Point location = new Point(camera.getLocation().getX(), 
+    				  camera.getLocation().getY(),
+    				  camera.getLocation().getZ() + 500, SpatialReference.create(4152));
+    		  camera = camera.moveTo(location);
+    		  sceneView.setViewpointCameraAsync(camera);
+    	  }
+      }
+      
+      public void rightShoulder(boolean pressed) {
+    	  if (pressed && camera.getLocation().getZ() > 1500) {
+    		  Point location = new Point(camera.getLocation().getX(), 
+    				  camera.getLocation().getY(),
+    				  camera.getLocation().getZ() - 500, SpatialReference.create(4152));
+    		  camera = camera.moveTo(location);
+    		  sceneView.setViewpointCameraAsync(camera);
+    	  }
       }
 
       public void rightThumbMagnitude(double m) {
@@ -174,20 +234,20 @@ public class Test extends Application {
         leftMagnitude = .01 / 1600.0 * camera.getLocation().getZ() * m;
       }
 
-      public void leftThumbDirection(double d) {
-        double latitudeChange = 0;
-        double longitudeChange = 0;
-        if (camera.getHeading() < 90 && camera.getHeading() > 0) {
-        	if ( d > 180 && d < 360 ) {
-           	 // if you are going left, and your heading is in between 0 and 90:
-           	latitudeChange =  - Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-           	longitudeChange =  Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-           } else  {
-           	// if you are going right, and your heading is in between 0 and 90:
-           	latitudeChange =   Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-           	longitudeChange = -   Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
-           }
-        }
+//      public void leftThumbDirection(double d) {
+//        double latitudeChange = 0;
+//        double longitudeChange = 0;
+//        if (camera.getHeading() < 90 && camera.getHeading() > 0) {
+//        	if ( d > 180 && d < 360 ) {
+//           	 // if you are going left, and your heading is in between 0 and 90:
+//           	latitudeChange =  - Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+//           	longitudeChange =  Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+//           } else  {
+//           	// if you are going right, and your heading is in between 0 and 90:
+//           	latitudeChange =   Math.sin( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+//           	longitudeChange = -   Math.cos( (90-camera.getHeading())*Math.PI / 180.0 )*leftMagnitude;
+//           }
+//        }
         
        
 //    	System.out.println("Direction: " + d);
@@ -195,69 +255,72 @@ public class Test extends Application {
 //         System.out.println("Lat change:" + latitudeChange);
 //         System.out.println("Long change: " + longitudeChange);
 
-        Point p = new Point(camera.getLocation().getX() + longitudeChange, camera.getLocation().getY() + latitudeChange, camera.getLocation().getZ(), SpatialReference.create(4152));
-        // System.out.println(p.getX() + "," + p.getY() + ","+ p.getZ());
-
-        camera = camera.moveTo(p);
-        // Point l = camera.getLocation();
-        // camera = new Camera(l.getX() + latitudeChange, l.getY() +
-        // longitudeChange, l.getZ(), camera.getHeading(), camera.getPitch(),
-        // camera.getRoll());
-        sceneView.setViewpointCameraAsync(camera);
-      }
+//        Point p = new Point(camera.getLocation().getX() + longitudeChange, camera.getLocation().getY() + latitudeChange, camera.getLocation().getZ(), SpatialReference.create(4152));
+//        // System.out.println(p.getX() + "," + p.getY() + ","+ p.getZ());
+//
+//        camera = camera.moveTo(p);
+//        // Point l = camera.getLocation();
+//        // camera = new Camera(l.getX() + latitudeChange, l.getY() +
+//        // longitudeChange, l.getZ(), camera.getHeading(), camera.getPitch(),
+//        // camera.getRoll());
+//        sceneView.setViewpointCameraAsync(camera);
+//      }
       
-      public void buttonB(boolean bool) {
-    	  if (bool) {
-    		  System.out.println("======\nLat: " + camera.getLocation().getX());
-    		  System.out.println("Long: " + camera.getLocation().getY());
-    		  //https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY
-    		  URL url = null;
-    		  
-    		  try {
-            url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
-          } catch (MalformedURLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-          }
-          Scanner s = null;
-          try {
-            s = new Scanner(url.openStream());
-            while(s.hasNext()){
-             // System.out.println(s.next());
-            }
-          } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
-    		  
-    		  
-    		  
-    		  
-          try {
-            url = new URL("https://maps.googleapis.com/maps/api/place/radarsearch/json?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&radius=5000&type=food&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
-          } catch (MalformedURLException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-          }
-    		  Scanner s = null;
-          try {
-            s = new Scanner(url.openStream());
-            while(s.hasNext()){
-             // System.out.println(s.next());
-            }
-          } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
-    		  
-    	  }
-      }
+//      public void buttonB(boolean bool) {
+//    	  if (bool) {
+//    		  System.out.println("======\nLat: " + camera.getLocation().getX());
+//    		  System.out.println("Long: " + camera.getLocation().getY());
+//    		  //https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY
+//    		  URL url = null;
+//    		  
+//    		  try {
+//            url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/xml?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&query=closest+restaurant&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
+//          } catch (MalformedURLException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//          }
+//          Scanner s = null;
+//          try {
+//            s = new Scanner(url.openStream());
+//            while(s.hasNext()){
+//             // System.out.println(s.next());
+//            }
+//          } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//          }
+//    		  
+//    		  
+//    		  
+//    		  
+//          try {
+//            url = new URL("https://maps.googleapis.com/maps/api/place/radarsearch/json?location="+camera.getLocation().getY()+","+camera.getLocation().getY()+"&radius=5000&type=food&key=AIzaSyBji1ewhxgDN6jUJyYEYZyQjG3Ws0dpkAY");
+//          } catch (MalformedURLException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//          }
+//    		  Scanner s = null;
+//          try {
+//            s = new Scanner(url.openStream());
+//            while(s.hasNext()){
+//             // System.out.println(s.next());
+//            }
+//          } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//          }
+//    		  
+//    	  }
+//      }
       
       public void buttonX(boolean bool){
         if(bool) {
           System.out.println("added CheckPoint");
           System.out.println("======\nLat: " + camera.getLocation().getY());
           System.out.println("Long: " + camera.getLocation().getX());
+          System.out.println("Alt: " + camera.getLocation().getZ());
+          System.out.println("Heading: " + camera.getHeading());
+          System.out.println("Pitch: " + camera.getPitch());
           china.addCheckpoint(camera.getLocation().getY(), camera.getLocation().getX());
         }
         
